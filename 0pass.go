@@ -92,11 +92,11 @@ func main() {
 			Usage: "Gets your password based on service provided.",
 			Action: func(c *cli.Context) {
 				var pass string
-				fmt.Println("Getting password for: " + c.Args().Get(0))
+				filename := c.Args().Get(0)
+				fmt.Println("Getting password for: " + filename)
 				fmt.Println("Please enter you master password:")
 				fmt.Scanln(&pass)
 				key := cryptog.GenKeySalt(pass, readSalt())
-				filename := c.Args().Get(0)
 				file, err := cryptog.ReadFile(filename)
 				if err != nil {
 					log.Fatal(err)
