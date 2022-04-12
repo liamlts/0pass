@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -47,6 +48,24 @@ func readSalt() []byte {
 		log.Fatal(err)
 	}
 	return []byte(dSalt)
+}
+
+func passwordList() []string {
+	passwords, err := ioutil.ReadDir("crypt/")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var passlist []string
+
+	for _, pass := range passwords {
+		passlist = append(passlist, pass.Name())
+	}
+
+	for i := range passlist {
+		passlist[i] = passlist[i][:len(passlist[i])-len(".data")]
+	}
+	return passlist
 }
 
 func main() {
@@ -106,6 +125,18 @@ func main() {
 				for i := range file {
 					fmt.Println(cryptog.Decrypt(key, file[i]))
 				}
+			},
+		},
+		{
+			Name:  "list",
+			Usage: "Shows list of all saved passwords.",
+			Action: func(*cli.Context) {
+				passwords := passwordList()
+
+				for i := range passwords {
+					fmt.Println(passwords[i])
+				}
+
 			},
 		},
 	}
