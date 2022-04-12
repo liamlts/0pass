@@ -132,6 +132,8 @@ func main() {
 			Usage: "Shows list of all saved passwords.",
 			Action: func(*cli.Context) {
 				passwords := passwordList()
+				fmt.Println("Password list")
+				fmt.Println("----------------")
 
 				for i := range passwords {
 					fmt.Println(passwords[i])
