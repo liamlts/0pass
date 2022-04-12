@@ -90,14 +90,13 @@ func main() {
 		{
 			Name:  "getpass",
 			Usage: "Gets your password based on service provided.",
-			Action: func(*cli.Context) {
+			Action: func(c *cli.Context) {
 				var pass string
+				fmt.Println("Getting password for: " + c.Args().Get(0))
 				fmt.Println("Please enter you master password:")
 				fmt.Scanln(&pass)
 				key := cryptog.GenKeySalt(pass, readSalt())
-				fmt.Println("What service are you looking for:")
-				var filename string
-				fmt.Scanln(&filename)
+				filename := c.Args().Get(0)
 				file, err := cryptog.ReadFile(filename)
 				if err != nil {
 					log.Fatal(err)
