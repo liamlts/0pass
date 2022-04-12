@@ -8,3 +8,5 @@
 <li>addpass</li>
 
 <li>getpass</li>
+
+<li>list</li>
