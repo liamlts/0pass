@@ -196,6 +196,7 @@ func main() {
 				fmt.Println("0pass -- simple, non-bloated password manager.")
 				fmt.Println("Materpass sets the password for accessing all your encrypted passwords.")
 				fmt.Println("All other commands will ask you for your masterpass to access your passwords.")
+				fmt.Println("AES-256 is used the stronger your masterpass the better.")
 			},
 		},
 	}
