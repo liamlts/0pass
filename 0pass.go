@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
+	"time"
 
 	"example.com/cryptog"
 
@@ -68,6 +70,28 @@ func passwordList() []string {
 	return passlist
 }
 
+func makePass(strength int) []byte {
+	var CharString = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%&")
+	var leng int
+	rand.Seed(time.Now().UnixNano())
+	switch strength {
+	case 1:
+		leng = 9
+	case 2:
+		leng = 13
+	case 3:
+		leng = 17
+	default:
+		leng = 17
+	}
+
+	p := make([]byte, leng)
+	for i := range p {
+		p[i] = CharString[rand.Intn(len(CharString))]
+	}
+	return p
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "0pass"
@@ -112,6 +136,10 @@ func main() {
 			Action: func(c *cli.Context) {
 				var pass string
 				filename := c.Args().Get(0)
+				if filename == "" {
+					fmt.Println("Error please specify a service.(ex. google, youtube, github")
+					os.Exit(1)
+				}
 				fmt.Println("Getting password for: " + filename)
 				fmt.Println("Please enter you master password:")
 				fmt.Scanln(&pass)
@@ -139,6 +167,35 @@ func main() {
 					fmt.Println(passwords[i])
 				}
 
+			},
+		},
+		{
+			Name:  "genpass",
+			Usage: "Generate a random secure password.",
+			Action: func(*cli.Context) {
+				var mpass string
+				var filename string
+				var stren int
+				fmt.Printf("Enter your master password: \n")
+				fmt.Scanln(&mpass)
+				salt := readSalt()
+				key := cryptog.GenKeySalt(mpass, salt)
+				fmt.Println("Enter a strength level (1-3): ")
+				fmt.Scanln(&stren)
+				mpass = string(makePass(stren))
+				fmt.Println("What service is this for: ")
+				fmt.Scanln(&filename)
+
+				cryptog.WriteToFile(filename, cryptog.Encrypt(key, mpass))
+			},
+		},
+		{
+			Name:  "help",
+			Usage: "Man for 0pass",
+			Action: func(*cli.Context) {
+				fmt.Println("0pass -- simple, non-bloated password manager.")
+				fmt.Println("Materpass sets the password for accessing all your encrypted passwords.")
+				fmt.Println("All other commands will ask you for your masterpass to access your passwords.")
 			},
 		},
 	}

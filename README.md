@@ -10,3 +10,7 @@
 <li>getpass</li>
 
 <li>list</li>
+
+<li>genpass</li>
+
+<li>help</li>
