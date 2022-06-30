@@ -13,6 +13,8 @@ import (
 	"example.com/cryptog"
 
 	"github.com/urfave/cli"
+
+	"golang.org/x/term"
 )
 
 func saveSalt(salt []byte) {
@@ -92,6 +94,25 @@ func makePass(strength int) []byte {
 	return p
 }
 
+func hasPass() int {
+	_, err := os.Stat("salt.data")
+	if err == nil {
+		return 0
+	} else if os.IsNotExist(err) {
+		return 1
+	}
+	return -1
+}
+
+func Validate() string {
+	fmt.Println("Enter your master password: ")
+	b, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(b)
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "0pass"
@@ -102,9 +123,13 @@ func main() {
 			Name:  "masterpass",
 			Usage: "Generate key and salt based on given password. This is your master password.",
 			Action: func(*cli.Context) {
-				var password string
-				fmt.Println("Enter your master password. AND WRITE IT DOWN!")
-				fmt.Scanln(&password)
+				//var password string
+				//fmt.Println("Enter your master password. AND WRITE IT DOWN!")
+				//fmt.Scanln(&password)
+				password := Validate()
+				if password == "" {
+					os.Exit(1)
+				}
 				_, salt := cryptog.GenKey(password)
 				saveSalt(salt)
 
@@ -114,10 +139,17 @@ func main() {
 			Name:  "addpass",
 			Usage: "Saves new password for given service using the master password.",
 			Action: func(*cli.Context) {
+				if hasPass() != 0 {
+					fmt.Println("Error! Please run masterpass")
+					os.Exit(1)
+				}
 				var filename string
-				var mpass string
-				fmt.Printf("Enter your master password: \n")
-				fmt.Scanln(&mpass)
+				//fmt.Printf("Enter your master password: \n")
+				//fmt.Scanln(&mpass)
+				mpass := Validate()
+				if mpass == "" {
+					os.Exit(1)
+				}
 				salt := readSalt()
 				key := cryptog.GenKeySalt(mpass, salt)
 				fmt.Println("Enter site name of what the password is used for:")
@@ -134,15 +166,22 @@ func main() {
 			Name:  "getpass",
 			Usage: "Gets your password based on service provided.",
 			Action: func(c *cli.Context) {
-				var pass string
+				if hasPass() != 0 {
+					fmt.Println("Error! Please run masterpass")
+					os.Exit(1)
+				}
 				filename := c.Args().Get(0)
 				if filename == "" {
 					fmt.Println("Error please specify a service.(ex. google, youtube, github")
 					os.Exit(1)
 				}
 				fmt.Println("Getting password for: " + filename)
-				fmt.Println("Please enter you master password:")
-				fmt.Scanln(&pass)
+				//fmt.Println("Please enter you master password:")
+				//fmt.Scanln(&pass)
+				pass := Validate()
+				if pass == "" {
+					os.Exit(1)
+				}
 				key := cryptog.GenKeySalt(pass, readSalt())
 				file, err := cryptog.ReadFile(filename)
 				if err != nil {
@@ -173,11 +212,18 @@ func main() {
 			Name:  "genpass",
 			Usage: "Generate a random secure password.",
 			Action: func(*cli.Context) {
-				var mpass string
+				if hasPass() != 0 {
+					fmt.Println("Error! Please run masterpass")
+					os.Exit(1)
+				}
 				var filename string
 				var stren int
-				fmt.Printf("Enter your master password: \n")
-				fmt.Scanln(&mpass)
+				//fmt.Printf("Enter your master password: \n")
+				//fmt.Scanln(&mpass)
+				mpass := Validate()
+				if mpass == "" {
+					os.Exit(1)
+				}
 				salt := readSalt()
 				key := cryptog.GenKeySalt(mpass, salt)
 				fmt.Println("Enter a strength level (1-3): ")
