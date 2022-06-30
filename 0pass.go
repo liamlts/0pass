@@ -123,9 +123,6 @@ func main() {
 			Name:  "masterpass",
 			Usage: "Generate key and salt based on given password. This is your master password.",
 			Action: func(*cli.Context) {
-				//var password string
-				//fmt.Println("Enter your master password. AND WRITE IT DOWN!")
-				//fmt.Scanln(&password)
 				password := Validate()
 				if password == "" {
 					os.Exit(1)
@@ -144,8 +141,6 @@ func main() {
 					os.Exit(1)
 				}
 				var filename string
-				//fmt.Printf("Enter your master password: \n")
-				//fmt.Scanln(&mpass)
 				mpass := Validate()
 				if mpass == "" {
 					os.Exit(1)
@@ -176,8 +171,6 @@ func main() {
 					os.Exit(1)
 				}
 				fmt.Println("Getting password for: " + filename)
-				//fmt.Println("Please enter you master password:")
-				//fmt.Scanln(&pass)
 				pass := Validate()
 				if pass == "" {
 					os.Exit(1)
@@ -218,8 +211,6 @@ func main() {
 				}
 				var filename string
 				var stren int
-				//fmt.Printf("Enter your master password: \n")
-				//fmt.Scanln(&mpass)
 				mpass := Validate()
 				if mpass == "" {
 					os.Exit(1)
@@ -241,7 +232,7 @@ func main() {
 			Action: func(*cli.Context) {
 				fmt.Println("0pass -- simple, non-bloated password manager.")
 				fmt.Println("Materpass sets the password for accessing all your encrypted passwords.")
-				fmt.Println("All other commands will ask you for your masterpass to access your passwords.")
+				fmt.Println("You must set a masterpass before running other commands.")
 				fmt.Println("AES-256 is used the stronger your masterpass the better.")
 			},
 		},
